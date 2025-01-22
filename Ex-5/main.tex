@@ -106,6 +106,58 @@ Iterating and updating the value of $x_{n}$, we can obtain the roots of the quad
 Newton-Raphson Root: 0.8164972809158475, Iterations: 18\\
 Actual Root:0.81649658092\\
 
+\textbf{Solution by Matrix method:}
+
+The general quadratic equation is expressed as:
+\begin{align}
+    a\lambda^2 + b\lambda + c &= 0
+\end{align}
+
+Dividing through by \(a\), we get:
+\begin{align}
+    \lambda^2 + \frac{b}{a} \lambda + \frac{c}{a} &= 0
+\end{align}
+
+This equation can be rewritten as:
+\begin{align}
+    \lambda \brak{\lambda + \frac{b}{a}} + \frac{c}{a} &= 0 \\
+    -\lambda \brak{-\lambda - \frac{b}{a}} - (-1)\frac{c}{a} &= 0
+\end{align}
+
+This form is equivalent to the determinant of the following matrix:
+\begin{align}
+    \det\myvec{-\lambda & 1 \\ -\frac{c}{a} & -\frac{b}{a} - \lambda} &= 0 \label{eq:matrix}
+\end{align}
+
+Clearly, the eigenvalues of the matrix:
+\begin{align}
+    \vec{C} = \myvec{0 & 1 \\ -\frac{c}{a} & -\frac{b}{a}} \label{eq:cmat}
+\end{align}
+are the roots of the required quadratic equation. This matrix \(\vec{C}\) is called the \textbf{Companion matrix}.
+
+
+The companion matrix \(\vec{C}\) is:
+\begin{align}
+    \vec{C} = \myvec{0 & 1 \\ \frac{-c}{a} & \frac{-b}{a}} = \myvec{0 & 1 \\ \frac{-2}{3} & \frac{2\sqrt{6}}{3}}
+\end{align}
+
+\subsection*{QR Decomposition for Eigenvalues}
+
+The eigenvalues of the companion matrix can also be found using the \textbf{QR decomposition} method. The steps are:
+
+1. Start with the companion matrix \(\vec{C}\).
+2. Decompose \(\vec{C}\) into the product of an orthogonal matrix \(\vec{Q}\) and an upper triangular matrix \(\vec{R}\), such that:
+   \[
+   \vec{C} = \vec{Q}\vec{R}
+   \]
+3. Compute a new matrix \(\vec{C}_1\) as:
+   \[
+   \vec{C}_1 = \vec{R}\vec{Q}
+   \]
+   This process shifts the eigenvalues of \(\vec{C}\) closer to the diagonal.
+
+4. Repeat the above steps iteratively until \(\vec{C}_k\) converges to a diagonal matrix. The diagonal entries of the final matrix are the eigenvalues of \(\vec{C}\), which correspond to the roots of the quadratic equation.
+
 \begin{figure}[h]
 	\centering
 	\includegraphics[width=\columnwidth]{figs/fig.pdf}
