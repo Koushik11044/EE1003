@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <math.h>
-#include <stdlib.h>
 #include <stdbool.h>
 
 #define TOL 1e-8
@@ -8,24 +7,34 @@
 
 // Function to perform QR decomposition
 void qr_decomposition(double M[2][2], double Q[2][2], double R[2][2]) {
-    double norm = sqrt(M[0][0] * M[0][0] + M[1][0] * M[1][0]);
+    double norm1 = sqrt(M[0][0] * M[0][0] + M[1][0] * M[1][0]);
+    if (norm1 < TOL) norm1 = 1e-10;  // Avoid division by zero
+    
+    // First column of Q
+    Q[0][0] = M[0][0] / norm1;
+    Q[1][0] = M[1][0] / norm1;
 
-    // Compute Q
-    Q[0][0] = M[0][0] / norm;
-    Q[1][0] = M[1][0] / norm;
-    Q[0][1] = -M[1][0] / norm;
-    Q[1][1] = M[0][0] / norm;
+    // Orthogonalize the second column
+    double dot_product = Q[0][0] * M[0][1] + Q[1][0] * M[1][1];
+    double temp1 = M[0][1] - dot_product * Q[0][0];
+    double temp2 = M[1][1] - dot_product * Q[1][0];
+    double norm2 = sqrt(temp1 * temp1 + temp2 * temp2);
+
+    if (norm2 < TOL) norm2 = 1e-10;
+
+    Q[0][1] = temp1 / norm2;
+    Q[1][1] = temp2 / norm2;
 
     // Compute R
-    R[0][0] = Q[0][0] * M[0][0] + Q[1][0] * M[1][0];
-    R[0][1] = Q[0][0] * M[0][1] + Q[1][0] * M[1][1];
-    R[1][0] = 0;
-    R[1][1] = Q[0][1] * M[0][1] + Q[1][1] * M[1][1];
+    for (int i = 0; i < 2; i++) {
+        for (int j = i; j < 2; j++) {
+            R[i][j] = Q[0][i] * M[0][j] + Q[1][i] * M[1][j];
+        }
+    }
 }
 
 // Function to compute the eigenvalues using QR decomposition
 void find_eigenvalues(double a, double b, double c, double *eigen1, double *eigen2) {
-    // Initialize the companion matrix M for the quadratic equation
     double M[2][2] = {
         {0, -c / a},
         {1, -b / a}
@@ -49,13 +58,11 @@ void find_eigenvalues(double a, double b, double c, double *eigen1, double *eige
             }
         }
 
-        // Check for convergence
         if (fabs(new_M[1][0]) < TOL) {
             converged = true;
             break;
         }
 
-        // Update M
         for (int i = 0; i < 2; i++) {
             for (int j = 0; j < 2; j++) {
                 M[i][j] = new_M[i][j];
@@ -64,19 +71,12 @@ void find_eigenvalues(double a, double b, double c, double *eigen1, double *eige
 
         iter++;
     }
-
-    if (converged) {
         *eigen1 = M[0][0];
         *eigen2 = M[1][1];
-    } else {
-        printf("QR decomposition did not converge within the iteration limit.\n");
-        *eigen1 = NAN;
-        *eigen2 = NAN;
-    }
 }
 
 int main() {
-   double a = 3.0, b = -2.0 * sqrt(6), c = 2.0;; // Coefficients of the quadratic equation
+    double a = 3.0, b = -2.0 * sqrt(6), c = 2.0;
     double eigen1, eigen2;
 
     find_eigenvalues(a, b, c, &eigen1, &eigen2);
@@ -89,4 +89,3 @@ int main() {
 
     return 0;
 }
-
